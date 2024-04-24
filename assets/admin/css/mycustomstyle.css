@@ -1,0 +1,52 @@
+.width30 {
+    width: 30%;
+}
+
+.float_right {
+    float: right !important;
+}
+
+.custom_img {
+    width: 150px;
+    height: 150px;
+}
+
+.card_title_center {
+    width: 100%;
+    text-align: center !important;
+}
+
+.custom_thead {
+    background-color: rgb(240, 247, 255);
+    color: rgb(29, 74, 100);
+    font-size: medium;
+}
+
+.card_header_style {
+    background-color: rgb(209, 229, 240);
+    color: rgb(0, 0, 0);
+    border-style: initial;
+    border-color: rgb(202, 202, 231);
+}
+
+.card_body_style {
+    background-color: #fff;
+    color: rgb(37, 24, 221);
+    size: 14px;
+    margin: 0px;
+}
+
+.sidebar_style {
+    background-color: #000;
+    color: rgb(199, 27, 27);
+
+    border-color: rgb(8, 8, 15);
+}
+
+.body_head_style {
+    background-color: rgba(249, 250, 252, 0.363);
+    color: rgb(224, 219, 216);
+
+    border-color: rgb(73, 73, 231);
+
+}
