@@ -149,13 +149,19 @@ class TreasuryController extends Controller
 
     public function ajax_search(Request $request)
     {
-        if ($request->ajax()) {
-            $search_by_text = $request->search_by_text;
-            $data = Treasury::selection()->where('name', 'LIKE', "%{$search_by_text}%")
-                ->orderBy('id', 'DESC')
-                ->paginate(PAGINATION_COUNT);
+        try {
+            if ($request->ajax()) {
+                $search_by_text = $request->search_by_text;
+                $data = Treasury::selection()->where('name', 'LIKE', "%{$search_by_text}%")
+                    ->orderBy('id', 'DESC')
+                    ->paginate(PAGINATION_COUNT);
 
-            return view('admin.treasuries.ajax_search', compact('data'));
+                return view('admin.treasuries.ajax_search', compact('data'));
+            }
+        } catch (\Exception $ex) {
+            session()->flash('error', 'حدث خطاء ما'.' => '.$ex->getMessage());
+
+            return redirect()->back();
         }
     }
 

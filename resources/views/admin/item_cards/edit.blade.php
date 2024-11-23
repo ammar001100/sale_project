@@ -408,6 +408,6 @@
         }
     </script>
     <script src="{{ URL::asset('assets/admin/plugins/toastr/toastr.min.js') }}"></script>
-    <script src="{{ URL::asset('assets/admin/js/item_card.js') }}"></script>
+    <script src="{{ URL::asset('assets/admin/js/item_card_validation.js') }}"></script>
     <script src="{{ URL::asset('assets/admin/js/image_preview.js') }}"></script>
 @endsection

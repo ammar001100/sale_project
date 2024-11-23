@@ -116,6 +116,7 @@
                                                                         class="btn btn-outline-light">متابعة</button>
                                                                     <button type="button" class="btn btn-outline-light"
                                                                         data-dismiss="modal">الغاء</button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                         <!-- /.modal-content -->

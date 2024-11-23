@@ -56,6 +56,18 @@ return [
             'url' => env('APP_URL').'/assets',
             'visibility' => 'public',
         ],
+        'customers_imgs' => [
+            'driver' => 'local',
+            'root' => base_path().'/assets/admin/uploads/customers_imgs',
+            'url' => env('APP_URL').'/assets',
+            'visibility' => 'public',
+        ],
+        'suppliers_imgs' => [
+            'driver' => 'local',
+            'root' => base_path().'/assets/admin/uploads/suppliers_imgs',
+            'url' => env('APP_URL').'/assets',
+            'visibility' => 'public',
+        ],
 
         's3' => [
             'driver' => 's3',

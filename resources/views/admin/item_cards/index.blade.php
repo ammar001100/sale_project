@@ -1,5 +1,6 @@
 @extends('admin.layouts.app')
 @section('css')
+    <link rel="stylesheet" href="{{ URL::asset('assets/admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 @endsection
 @section('headTitle')
     الاصناف
@@ -21,28 +22,37 @@
                 <div class="card-header card_header_style">
                     <h3 class="card-title card_title_center">بيانات الاصناف</h3><br>
                     <div class="row">
-                        @if (isset($data) && $data->count() >= 3)
-                            <div class="col-md-3">
-                                <input type="text" id="search_by_text" class="form-control" placeholder="بحث بالاسم">
-                            </div>
-                            <div class="col-md-3">
-                                <select class="custom-select" name="is_master_search" id="is_master_search">
-                                    <option value="all">
-                                        بحث بالوحدة
-                                    </option>
-                                    <option value="1">
-                                        وحدة اب
-                                    </option>
-                                    <option value="0">
-                                        وحدة تجزئة
-                                    </option>
-                                </select>
+                        @if (isset($data) && $data->count() >= 5)
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="icheck-success d-inline">
+                                        <input type="radio" value="barcode" name="r3" id="radio">
+                                        <label for="radio">
+                                        </label>
+                                    </div>
+                                    بحث بالباركود
+                                    <div class="icheck-success d-inline">
+                                        <input type="radio" value="item_code" name="r3" id="radio2">
+                                        <label for="radio2">
+                                        </label>
+                                    </div>
+                                    بحث بالكود
+                                    <div class="icheck-success d-inline">
+                                        <input type="radio" value="name" name="r3" id="radio1" checked>
+                                        <label for="radio1">
+                                        </label>
+                                    </div>
+                                    بحث بالاسم
+                                </div>
+                                <input type="text" id="search_by_text" class="form-control"
+                                    placeholder="ادخل الباركود او الكود او الاسم">
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <select class="custom-select" name="item_type" id="item_type">
-                                        <option value="">
-                                            بحث بالنوع
+                                    <div style="margin-bottom: 15px;">بحث بالنوع</div>
+                                    <select class="custom-select" name="item_type_search" id="item_type_search">
+                                        <option value="all">
+                                            الكل
                                         </option>
                                         <option value="1">
                                             مخزني
@@ -58,8 +68,10 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <select class="custom-select" name="itemcard_category_id" id="itemcard_category_id">
-                                        <option value="">بحث بالفئة</option>
+                                    <div style="margin-bottom: 15px;">بحث بالفئة</div>
+                                    <select class="custom-select" name="itemcard_category_id_search"
+                                        id="itemcard_category_id_search">
+                                        <option value="all">الكل</option>
                                         @if (@isset($Itemcard_categories) && !@empty($Itemcard_categories))
                                             @foreach ($Itemcard_categories as $info)
                                                 <option @if (old('itemcard_category_id') == $info->id) selected @else '' @endif
@@ -69,10 +81,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <input type="hidden" id="ajax_search_url" value="{{ route('admin.uoms.ajax_search') }}">
+                            <input type="hidden" id="ajax_search_url" value="{{ route('item_cards.ajax_search') }}">
                             <input type="hidden" id="token_search" value="{{ csrf_token() }}">
+                            @endif
                     </div>
-                    @endif
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive p-2 card_body_style">
@@ -113,26 +125,32 @@
                                             <td>{{ $info->itemcard_category->name }}</td>
                                             <td>
                                                 @if ($info->item_card_id != 0)
-                                                    {{ $info->parent->name }}
+                                                    @if (@isset($info->parent->name))
+                                                        {{ $info->parent->name }}
+                                                    @else
+                                                        لا يوجد
+                                                    @endif
                                                 @else
                                                     صنف اب
                                                 @endif
                                             </td>
-                                            <td>{{ $info->uom->name }}</td>
                                             <td>
-                                                @if (empty($info->retail_uom->name))
-                                                    لا توجد
+                                                @if (isset($info->uom->name))
+                                                    {{ $info->uom->name }}
                                                 @else
+                                                    لا يوجد
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if (isset($info->retail_uom->name))
                                                     {{ $info->retail_uom->name }}
+                                                @else
+                                                    لا يوجد
                                                 @endif
                                             </td>
                                             <td>
                                                 <a href="{{ route('item_cards.edit', $info->id) }}"
                                                     class="btn btn-sm btn-info"> <i class="fas fa-pencil-alt"></i></a>
-                                                <!--<button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                                                                                                data-target="#modal-show{{ $info->id }}">
-                                                                                                <i class="fas fa-eye"></i>-->
-                                                </button>
                                                 <a href="{{ route('item_cards.show', $info->id) }}"
                                                     class="btn btn-primary btn-sm">
                                                     <i class="fas fa-eye"></i>
@@ -141,104 +159,6 @@
                                                     data-target="#modal-delete{{ $info->id }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
-                                                <!-- show modal -->
-                                                <div class="modal fade" id="modal-show{{ $info->id }}">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content bg-default">
-                                                            <div class="modal-header">
-                                                                <h4 class="modal-title">تفاصيل مخزن -
-                                                                    {{ $info->name }}</h4>
-                                                                <button type="button" class="close" data-dismiss="modal"
-                                                                    aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <table id="example1"
-                                                                    class="table table-bordered table-striped">
-                                                                    <tr>
-                                                                        <td class="width30">
-                                                                            حالة التفعيل
-                                                                        </td>
-                                                                        <td>
-                                                                            @if ($info->active == 1)
-                                                                                مفعل
-                                                                            @else
-                                                                                غير مفعل
-                                                                            @endif
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="width30">
-                                                                            تاريخ الاضافة
-                                                                        </td>
-                                                                        <td>
-                                                                            @php
-                                                                                $dt = new DateTime($info->created_at);
-                                                                                $date = $dt->format('Y-m-d');
-                                                                                $time = $dt->format('H:i');
-                                                                                $newDateTime = date(
-                                                                                    'A',
-                                                                                    strtotime($time),
-                                                                                );
-                                                                                $newDateTimeType =
-                                                                                    $newDateTime == 'AM'
-                                                                                        ? 'صباحا'
-                                                                                        : 'مساء';
-                                                                            @endphp
-                                                                            {{ $date }}
-                                                                            <br>
-                                                                            {{ $time }}
-                                                                            {{ $newDateTimeType }}<br>
-                                                                            بواسطة :
-                                                                            {{ $info->added_by_admin }}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="width30">
-                                                                            تاريخ التحديث
-                                                                        </td>
-                                                                        <td>
-                                                                            @if ($info['updated_by'] > 0 and $info['updated_by'] != null)
-                                                                                @php
-                                                                                    $dt = new DateTime(
-                                                                                        $info['updated_at'],
-                                                                                    );
-                                                                                    $date = $dt->format('Y-m-d');
-                                                                                    $time = $dt->format('H:i');
-                                                                                    $newDateTime = date(
-                                                                                        'A',
-                                                                                        strtotime($time),
-                                                                                    );
-                                                                                    $newDateTimeType =
-                                                                                        $newDateTime == 'AM'
-                                                                                            ? 'صباحا'
-                                                                                            : 'مساء';
-                                                                                @endphp
-                                                                                {{ $date }}
-                                                                                <br>
-                                                                                {{ $time }}
-                                                                                {{ $newDateTimeType }}<br>
-                                                                                بواسطة :
-                                                                                {{ $info->updated_by_admin }}
-                                                                            @else
-                                                                                لا يوجد تحديث
-                                                                            @endif
-                                                                        </td>
-                                                                    </tr>
-
-                                                                </table>
-                                                            </div>
-                                                            <div class="modal-footer justify-content-between">
-                                                                <button type="button" class="btn btn-danger"
-                                                                    data-dismiss="modal">الغاء</button>
-                                                            </div>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- end show modal -->
                                                 <!-- are you shue modal -->
                                                 <div class="modal fade" id="modal-delete{{ $info->id }}">
                                                     <div class="modal-dialog">
@@ -255,8 +175,7 @@
                                                             </div>
                                                             <div class="modal-footer justify-content-between">
                                                                 <a href="{{ route('item_cards.destroy', $info->id) }}"
-                                                                    type="button"
-                                                                    class="btn btn-outline-light">متابعة</a>
+                                                                    type="button" class="btn btn-outline-light">متابعة</a>
                                                                 <button type="button" class="btn btn-outline-light"
                                                                     data-dismiss="modal">الغاء</button>
                                                             </div>
@@ -296,5 +215,11 @@
     </div>
 @endsection
 @section('script')
-    <script src="{{ URL::asset('assets/admin/js/treasuries.js') }}"></script>
+    <script src="{{ URL::asset('assets/admin/js/item_card_seaech.js') }}"></script>
+    <!-- InputMask -->
+    <script src="{{ URL::asset('assets/admin/plugins/inputmask/jquery.inputmask.bundle.js') }}"></script>
+    <script src="{{ URL::asset('assets/admin/plugins/moment/moment.min.js') }}"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="{{ URL::asset('assets/admin/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js') }}">
+    </script>
 @endsection

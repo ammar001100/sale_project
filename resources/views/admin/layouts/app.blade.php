@@ -2,8 +2,14 @@
 <html lang="en">
 
 <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Meta -->
+    <meta name="description" content=" المبرمج عمار">
+    <link rel="shortcut icon" href="{{ asset('assets/img/fav.png') }}" />
+    <!-- -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <title>@yield('headTitle')</title>
@@ -23,10 +29,27 @@
     <!-- Toastr -->
     <link rel="stylesheet" href="{{ URL::asset('assets/admin/plugins/toastr/toastr.min.css') }}">
 
-
 </head>
 
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini card_body_style">
+    <div class="slideInUp" style="
+        padding-top: 320px;
+        position: fixed;
+        top: 0;
+        left:0;
+        width: 100%;
+        height: 100%;
+        background-color:rgba(0, 0, 0, 0);
+        display: none;
+        justify-content:center;
+        align-items:center;
+        z-index: 9999;
+        text-align: center;
+" id="overlady">
+        <button class="btn btn-dark btn-light btn-sm" style="background-color: rgba(0, 0, 0, 0.684)">
+            <span class="spinner-border text-success">عمار</span>
+        </button>
+    </div>
     <div class="wrapper">
 
         <!-- Navbar -->
@@ -36,6 +59,7 @@
         @include('admin.include._sidebar')
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+
             <!-- Content Header (Page header) -->
             <div class="content-header body_head_style">
                 <div class="container-fluid">
@@ -97,7 +121,19 @@
     <!-- Toastr -->
     <script src="{{ URL::asset('assets/admin/plugins/toastr/toastr.min.js') }}"></script>
     <!-- general js -->
+    <!-- loading -->
+    <script>
+        $(document).ready(function() {
+            $(window).on("load", function() {
+                $("#overlady").fadeOut();
+            });
+            $(window).on("beforeunload", function() {
+                $("#overlady").fadeIn();
+                $("#overlady").fadeOut();
+            });
+        });
 
+    </script>
     @include('admin.partials._session')
     @yield('include')
 </body>

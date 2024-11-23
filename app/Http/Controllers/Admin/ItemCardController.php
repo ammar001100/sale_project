@@ -8,6 +8,7 @@ use App\Models\Item_card;
 use App\Models\Itemcard_category;
 use App\Models\Uom;
 use App\Traits;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ItemCardController extends Controller
@@ -16,8 +17,8 @@ class ItemCardController extends Controller
 
     public function index()
     {
-        $data = $this->get_cols_where(new Item_card, 'id', 'DESC', PAGINATION_COUNT);
-        $Itemcard_categories = Itemcard_category::selectionActive()->get();
+        $data = Item_card::Selection()->with(['parent', 'uom', 'retail_uom', 'itemcard_category'])->paginate(PAGINATION_COUNT);
+        $Itemcard_categories = Itemcard_category::selectionActive()->select('id', 'name')->get();
 
         return view('admin.item_cards.index', compact('data', 'Itemcard_categories'));
     }
@@ -26,9 +27,9 @@ class ItemCardController extends Controller
     {
         try {
             $Itemcard_categories = Itemcard_category::selectionActive()->get();
-            $uoms = Uom::SelectionActiveAndMaster()->get();
-            $retail_uoms = Uom::SelectionActiveAndNotMaster()->get();
-            $child_item_cards = Item_card::AllChildItemCardActive()->get();
+            $uoms = Uom::SelectionActiveAndMaster()->select('id', 'name')->get();
+            $retail_uoms = Uom::SelectionActiveAndNotMaster()->select('id', 'name')->get();
+            $child_item_cards = Item_card::AllChildItemCardActive()->select('id', 'name')->get();
 
             return view('admin.item_cards.create', compact('Itemcard_categories', 'uoms', 'retail_uoms', 'child_item_cards'));
         } catch (\Exception $ex) {
@@ -42,7 +43,7 @@ class ItemCardController extends Controller
     {
         try {
             $com_code = auth()->user()->com_code;
-            if ($request->has('photo') and $request->photo != 'default.png') {
+            if ($request->has('photo')) {
                 //validate image
                 $request->validate([
                     'photo' => 'required | mimes:png,jpg,jpeg | max:2000',
@@ -54,7 +55,7 @@ class ItemCardController extends Controller
                 $data_insert['photo'] = 'default.png';
             }
             //item code
-            $item_code = $child_item_cards = Item_card::Selection()->orderby('id', 'DESC')->first();
+            $item_code = Item_card::Selection()->orderby('id', 'DESC')->first();
             if (! empty($item_code)) {
                 $data_insert['item_code'] = $item_code->id + 1;
             } else {
@@ -73,7 +74,7 @@ class ItemCardController extends Controller
             } else {
                 $random = random_int(10000, 99999);
                 $random = substr($random, 0, 5);
-                $data_insert['barcode'] = 'item'.$data_insert['item_code'].$random;
+                $data_insert['barcode'] = $data_insert['item_code'].$random;
             }
             //check exist name
             $checkExists = Item_card::Selection()->where(['name' => $request->name])->first();
@@ -122,13 +123,13 @@ class ItemCardController extends Controller
     public function show(string $id)
     {
         try {
-            $data = Item_card::selection()->find($id);
-            $data = $this->added_byAndUpdated_by($data);
+            $data = Item_card::selection()->with(['parent', 'uom', 'retail_uom', 'itemcard_category'])->find($id);
             if (empty($data)) {
                 session()->flash('error', 'عفوا الصنف غير موجود');
 
-                return redirect()->back();
+                return redirect()->route('item_cards.index');
             }
+            $data = $this->added_byAndUpdated_by($data);
 
             return view('admin.item_cards.show', compact('data'));
         } catch (\Exception $ex) {
@@ -141,11 +142,11 @@ class ItemCardController extends Controller
     public function edit(string $id)
     {
         try {
-            $data = Item_card::selection()->find($id);
-            $Itemcard_categories = Itemcard_category::selectionActive()->get();
-            $uoms = Uom::SelectionActiveAndMaster()->get();
-            $retail_uoms = Uom::SelectionActiveAndNotMaster()->get();
-            $child_item_cards = Item_card::AllChildItemCardActive()->get();
+            $data = Item_card::selection()->with(['parent', 'uom', 'retail_uom', 'itemcard_category'])->find($id);
+            $Itemcard_categories = Itemcard_category::selectionActive()->select('id', 'name')->get();
+            $uoms = Uom::SelectionActiveAndMaster()->select('id', 'name')->get();
+            $retail_uoms = Uom::SelectionActiveAndNotMaster()->select('id', 'name')->get();
+            $child_item_cards = Item_card::AllChildItemCardActive()->select('id', 'name')->get();
             if ($data == null) {
                 session()->flash('error', 'عفوا الصنف غير موجوده');
 
@@ -163,7 +164,7 @@ class ItemCardController extends Controller
     public function update(ItemCardRequestRequest $request, string $id)
     {
         try {
-            $data = Item_card::selection()->find($id);
+            $data = Item_card::selection()->with(['parent', 'uom', 'retail_uom', 'itemcard_category'])->find($id);
             if (empty($data)) {
                 session()->flash('error', 'عفوا الصنف غير موجود');
 
@@ -237,13 +238,78 @@ class ItemCardController extends Controller
             $data_update['has_fixced_price'] = $request->has_fixced_price;
             $data_update['active'] = $request->active;
             $data_update['com_code'] = $com_code;
-            $data_update['added_by'] = auth()->user()->id;
-            $data_update['date'] = date('Y-m-d');
             $data_update['updated_by'] = auth()->user()->id;
             Item_card::Selection()->where(['id' => $id])->update($data_update);
             session()->flash('success', 'تم تحديث الصنف بنجاح');
 
             return redirect()->route('item_cards.show', $data->id);
+        } catch (\Exception $ex) {
+            session()->flash('error', 'حدث خطاء ما'.' => '.$ex->getMessage());
+
+            return redirect()->back();
+        }
+    }
+
+    public function ajax_search(Request $request)
+    {
+        try {
+            if ($request->ajax()) {
+                $search_by_text = $request->search_by_text;
+                $item_type = $request->item_type_search;
+                $itemcard_category_id = $request->itemcard_category_id_search;
+                $search_by_radio = $request->search_by_radio;
+                if ($item_type == 'all') {
+                    $field1 = 'id';
+                    $operator1 = '>';
+                    $value1 = '0';
+                } else {
+                    $field1 = 'item_type';
+                    $operator1 = '=';
+                    $value1 = $item_type;
+                }
+                if ($itemcard_category_id == 'all') {
+                    $field2 = 'id';
+                    $operator2 = '>';
+                    $value2 = '0';
+                } else {
+                    $field2 = 'itemcard_category_id';
+                    $operator2 = '=';
+                    $value2 = $itemcard_category_id;
+                }
+                if ($search_by_text != '') {
+                    if ($search_by_radio == 'barcode') {
+                        $field3 = 'barcode';
+                        $operator3 = '=';
+                        $value3 = $search_by_text;
+                    } elseif ($search_by_radio == 'item_code') {
+                        $field3 = 'item_code';
+                        $operator3 = '=';
+                        $value3 = $search_by_text;
+                    } elseif ($search_by_radio == 'name') {
+                        $field3 = 'name';
+                        $operator3 = 'LIKE';
+                        $value3 = "%{$search_by_text}%";
+                    } else {
+                        $field3 = 'id';
+                        $operator3 = '>';
+                        $value3 = '0';
+                    }
+                } else {
+                    $field3 = 'id';
+                    $operator3 = '>';
+                    $value3 = '0';
+                }
+                $data = Item_card::selection()
+                    ->with(['parent', 'uom', 'retail_uom', 'itemcard_category'])
+                    ->where($field1, $operator1, $value1)
+                    ->where($field2, $operator2, $value2)
+                    ->where($field3, $operator3, $value3)
+                    ->orderBy('id', 'DESC')
+                    ->paginate(PAGINATION_COUNT);
+                $data = $this->added_byAndUpdated_by_array($data);
+
+                return view('admin.item_cards.ajax_search', compact('data'));
+            }
         } catch (\Exception $ex) {
             session()->flash('error', 'حدث خطاء ما'.' => '.$ex->getMessage());
 

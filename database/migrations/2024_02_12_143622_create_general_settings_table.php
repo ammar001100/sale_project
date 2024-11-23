@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('system_name');
             $table->string('photo')->default('default.png');
             $table->integer('active');
+            $table->integer('customer_parent_account_id')->nullable();
+            $table->integer('supplier_parent_account_id')->nullable();
+            $table->integer('delegate_parent_account_id')->nullable();
+            $table->integer('employee_parent_account_id')->nullable();
             $table->string('general_alert')->nullable();
             $table->string('address');
             $table->string('phone');

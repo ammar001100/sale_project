@@ -14,12 +14,40 @@
 .card_title_center {
     width: 100%;
     text-align: center !important;
+    color: #000000;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+    transition: color 0.5s ease;
 }
 
+
+/*خلية منفردة في الجدول*/
+
+.table_td1 {
+    text-align: center !important;
+    background-color: rgb(184, 217, 228);
+    color: #000000;
+}
+
+.table_td2 {
+    color: #000000;
+    background-color: #ffffff;
+    text-align: center !important;
+}
+
+/*
+ترويسة الجدول
+*/
+
 .custom_thead {
-    background-color: rgb(240, 247, 255);
-    color: rgb(29, 74, 100);
-    font-size: medium;
+    background-color: #fff;
+    color: #000000;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+    transition: color 0.5s ease;
 }
 
 .card_header_style {
@@ -29,24 +57,38 @@
     border-color: rgb(202, 202, 231);
 }
 
+
+/*
+جسم الجدول
+*/
+
 .card_body_style {
     background-color: #fff;
-    color: rgb(37, 24, 221);
-    size: 14px;
-    margin: 0px;
+    color: #000000;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+    transition: color 0.5s ease;
+}
+
+.card_button_style {
+    color: #efdfdf;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+    transition: color 0.5s ease;
 }
 
 .sidebar_style {
-    background-color: #000;
+    background-color: rgb(126, 135, 145);
     color: rgb(199, 27, 27);
-
-    border-color: rgb(8, 8, 15);
+    border-color: rgb(253, 3, 3);
 }
 
 .body_head_style {
     background-color: rgba(249, 250, 252, 0.363);
     color: rgb(224, 219, 216);
-
     border-color: rgb(73, 73, 231);
-
 }

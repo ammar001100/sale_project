@@ -27,7 +27,14 @@ class Store extends Model
             ->where(['com_code' => auth()->user()->com_code])
             ->select(['id', 'name', 'phones', 'address', 'com_code', 'active', 'added_by', 'updated_by', 'created_at', 'updated_at', 'date'])
             ->orderby('id', 'DESC');
-        //->get();
+    }
+
+    public function scopeSelectionActive($q)
+    {
+        return $q
+            ->where(['com_code' => auth()->user()->com_code, 'active' => 1])
+            ->select(['id', 'name', 'phones', 'address', 'com_code', 'active', 'added_by', 'updated_by', 'created_at', 'updated_at', 'date'])
+            ->orderby('id', 'DESC');
     }
 
     public function admin()

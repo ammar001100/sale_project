@@ -32,13 +32,16 @@
             </div>
         </div>
     </form>
-
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <a href="{{ route('admin.setting.general') }}" class="btn">
+    <div id="loading-wrapper">
+  <span class="spinner-grow text-success"></span>
+  </div>
+  <span id="timer-countdown"></span>
+  <a href="{{ route('admin.setting.general') }}" class="btn">
             <img src="{{ URL::asset('assets/admin/uploads/admin_sttings_imgs/' . auth()->user()->generalSetting->photo) }}"
                 alt="صورة" class="brand-image img-circle elevation-3" style="opacity: .8">
-            <span class="brand-text font-weight-light">{{ auth()->user()->generalSetting->system_name }}</span>
-        </a>
+            <span class="brand-text font-weight-light"><b>{{ auth()->user()->generalSetting->system_name }}</b></span>
+        </a>  
     </ul>
 </nav>

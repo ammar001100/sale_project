@@ -23,11 +23,15 @@ class Sales_matrial_type extends Model
     {
         return $q
             ->where(['com_code' => auth()->user()->com_code])
-            ->select(['id', 'name', 'com_code', 'active', 'added_by', 'updated_by', 'created_at', 'updated_at', 'date'])
-            ->orderby('id', 'DESC');
-        //->get();
+            //->select([])
+            ->orderby('id', 'DESC'); //ASC
     }
-
+    public function scopeSelectionActive($q)
+    {
+        return $q
+            ->where(['com_code' => auth()->user()->com_code, 'active' => 1])
+            ->orderby('id', 'DESC'); //ASC
+    }
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'com_code');

@@ -99,34 +99,40 @@ class UomController extends Controller
 
     public function ajax_search(Request $request)
     {
-        if ($request->ajax()) {
-            $search_by_text = $request->search_by_text;
-            $is_master_search = $request->is_master_search;
-            if ($search_by_text == '') {
-                $field1 = 'id';
-                $operator1 = '>';
-                $value1 = '0';
-            } else {
-                $field1 = 'name';
-                $operator1 = 'LIKE';
-                $value1 = "%{$search_by_text}%";
-            }
-            if ($is_master_search == 'all') {
-                $field2 = 'id';
-                $operator2 = '>';
-                $value2 = '0';
-            } else {
-                $field2 = 'is_master';
-                $operator2 = '=';
-                $value2 = $is_master_search;
-            }
-            $data = Uom::selection()->where($field1, $operator1, $value1)
-                ->where($field2, $operator2, $value2)
-                ->orderBy('id', 'DESC')
-                ->paginate(PAGINATION_COUNT);
-            $data = $this->added_byAndUpdated_by_array($data);
+        try {
+            if ($request->ajax()) {
+                $search_by_text = $request->search_by_text;
+                $is_master_search = $request->is_master_search;
+                if ($search_by_text == '') {
+                    $field1 = 'id';
+                    $operator1 = '>';
+                    $value1 = '0';
+                } else {
+                    $field1 = 'name';
+                    $operator1 = 'LIKE';
+                    $value1 = "%{$search_by_text}%";
+                }
+                if ($is_master_search == 'all') {
+                    $field2 = 'id';
+                    $operator2 = '>';
+                    $value2 = '0';
+                } else {
+                    $field2 = 'is_master';
+                    $operator2 = '=';
+                    $value2 = $is_master_search;
+                }
+                $data = Uom::selection()->where($field1, $operator1, $value1)
+                    ->where($field2, $operator2, $value2)
+                    ->orderBy('id', 'DESC')
+                    ->paginate(PAGINATION_COUNT);
+                $data = $this->added_byAndUpdated_by_array($data);
 
-            return view('admin.uoms.ajax_search', compact('data'));
+                return view('admin.uoms.ajax_search', compact('data'));
+            }
+        } catch (\Exception $ex) {
+            session()->flash('error', 'حدث خطاء ما'.' => '.$ex->getMessage());
+
+            return redirect()->back();
         }
     }
 

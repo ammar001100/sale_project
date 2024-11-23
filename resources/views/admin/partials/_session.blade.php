@@ -9,3 +9,8 @@
         toastr.error('{{ session('error') }}')
     </script>
 @endif
+@if (session('warning'))
+    <script>
+        toastr.warning('{{ session('warning') }}')
+    </script>
+@endif

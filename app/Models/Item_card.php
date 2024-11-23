@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Item_card extends Model
 {
     use HasFactory;
-    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -16,15 +15,30 @@ class Item_card extends Model
         'itemcard_category_id',
         'item_card_id',
         'does_has_retailunit',
-        'retail_uom_id', 'price',
-        'uom_id', 'nos_gomal_price', 'gomal_price',
+        'retail_uom_id',
+        'price',
+        'uom_id',
+        'nos_gomal_price',
+        'gomal_price',
         'retail_uom_quntToparent',
-        'active', 'price_retail', 'gomal_price_retail',
-        'com_code', 'nos_gomal_price_retail',
-        'added_by', 'cost_price', 'cost_price_retail',
-        'updated_by', 'has_fixced_price',
-        'date', 'quentity', 'quentity_retail', 'quentity_all_retails',
-        'barcode', 'item_code', 'photo',
+        'active',
+        'price_retail',
+        'gomal_price_retail',
+        'com_code',
+        'nos_gomal_price_retail',
+        'added_by',
+        'cost_price',
+        'cost_price_retail',
+        'updated_by',
+        'has_fixced_price',
+        'date',
+        'quentity',
+        'all_quentity',
+        'quentity_retail',
+        'quentity_all_retails',
+        'barcode',
+        'item_code',
+        'photo',
 
     ];
 
@@ -32,14 +46,6 @@ class Item_card extends Model
     {
         return $q
             ->where(['com_code' => auth()->user()->com_code])
-            ->select(['id', 'name', 'item_type', 'itemcard_category_id',
-                'item_card_id', 'does_has_retailunit', 'retail_uom_id',
-                'uom_id', 'retail_uom_quntToparent', 'com_code', 'barcode',
-                'active', 'added_by', 'updated_by', 'price', 'photo',
-                'nos_gomal_price', 'gomal_price', 'gomal_price_retail',
-                'nos_gomal_price_retail', 'price_retail', 'has_fixced_price',
-                'created_at', 'updated_at', 'cost_price', 'cost_price_retail',
-                'quentity', 'quentity_retail', 'quentity_all_retails', 'date'])
             ->orderby('id', 'DESC');
     }
 
@@ -47,10 +53,6 @@ class Item_card extends Model
     {
         return $q
             ->where(['com_code' => auth()->user()->com_code, 'active' => '1'])
-            ->select(['id', 'name', 'item_type', 'itemcard_category_id',
-                'item_card_id', 'does_has_retailunit', 'retail_uom_id',
-                'uom_id', 'retail_uom_quntToparent', 'com_code',
-                'active', 'added_by', 'updated_by', 'created_at', 'updated_at', 'date'])
             ->orderby('id', 'DESC');
     }
 
@@ -68,7 +70,6 @@ class Item_card extends Model
     {
         return $q
             ->where(['com_code' => auth()->user()->com_code, 'active' => '1', 'item_card_id' => '0'])
-            ->select()
             ->orderby('id', 'DESC');
     }
 
@@ -95,5 +96,9 @@ class Item_card extends Model
     public function itemcard_category()
     {
         return $this->belongsTo(Itemcard_Category::class);
+    }
+    public function batches()
+    {
+        return $this->hasMany(Itemcard_batche::class);
     }
 }

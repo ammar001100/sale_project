@@ -33,6 +33,7 @@ return new class extends Migration
             $table->decimal('cost_price_retail')->default(0);
             $table->integer('has_fixced_price');
             $table->decimal('quentity')->default(0);
+            $table->decimal('all_quentity')->default(0);
             $table->decimal('quentity_retail')->default(0);
             $table->decimal('quentity_all_retails')->default(0);
             $table->string('photo')->default('default.png');
